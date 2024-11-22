@@ -68,7 +68,7 @@ cd ../frontend
 npm run dev
 ```
 
-Проєкт буде доступний за адресою [http://localhost:3000](http://localhost:3000).
+Проєкт буде доступний за адресою [http://localhost:5173/](http://localhost:5173/).
 
 ## Формат повідомлень комітів
 
