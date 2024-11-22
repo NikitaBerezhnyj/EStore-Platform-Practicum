@@ -1,6 +1,6 @@
-# EStore-Project-Practicum
+# EStore
 
-- [EStore-Project-Practicum](#estore-project-practicum)
+- [EStore](#estore)
   - [Про проект](#про-проект)
   - [Технології](#технології)
   - [Інструкція по запуску](#інструкція-по-запуску)
