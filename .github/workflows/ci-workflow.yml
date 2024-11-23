@@ -11,6 +11,9 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16, 18, 22]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -18,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16 18 22"
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: |
