@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  estore-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - estore-backend
+
+  estore-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    environment:
+      - DB=mongodb://estore-mongo:27017/estore
+    depends_on:
+      - estore-mongo
+
+  estore-mongo:
+    image: mongo:5
+    command: mongod --quiet --logpath /data/db/mongod.log
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
