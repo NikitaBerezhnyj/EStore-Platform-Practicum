@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const userRoutes = require("../routes/userRoutes");
+const serverStatusRoutes = require("../routes/serverStatusRoutes");
+const usersRoutes = require("../routes/usersRoutes");
 
 const createServer = () => {
   const app = express();
@@ -22,7 +23,8 @@ const createServer = () => {
   app.use(express.json());
 
   // Підключення роутерів
-  app.use("/api", userRoutes);
+  app.use("/api", serverStatusRoutes);
+  app.use("/api", usersRoutes);
 
   // Статичні файли (наприклад, для зображень чи інших ресурсів)
   app.use("/static", express.static(path.join(__dirname, "..", "static")));
