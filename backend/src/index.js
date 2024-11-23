@@ -1,29 +1,23 @@
-const express = require("express");
-const mongoose = require("mongoose");
 require("dotenv").config();
+const connectionServer = require("./config/serverConfig");
+const connectionDB = require("./config/dbConfig");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const MONGO_URI = process.env.DB || "mongodb://localhost:27017/estore";
+const app = connectionServer();
 
-app.use(express.json());
+const host = process.env.HOSTNAME || "localhost";
+const port = Number(process.env.PORT) || 5000;
 
-mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log(`Підключено до MongoDB за посиланням ${process.env.DB}`);
-    app.listen(PORT, () => {
-      console.log(`Сервер запущено на порту ${PORT}`);
+const startServer = async () => {
+  try {
+    await connectionDB();
+
+    app.listen(port, host, () => {
+      console.log(`Server started on http://${host}:${port}`);
     });
-  })
-  .catch(error => {
-    console.error("Помилка підключення до MongoDB:", error.message);
+  } catch (error) {
+    console.error("Failed to start the server:", error);
     process.exit(1);
-  });
+  }
+};
 
-app.post("/test", (req, res) => {
-  res.send(`Сервер працює на ${process.env.PORT}`);
-});
+startServer();
