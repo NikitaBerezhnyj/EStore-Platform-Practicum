@@ -4,18 +4,18 @@ on:
   push:
     branches:
       - "*"
-      paths:
-        - "backend/**/*.js"
-        - "backend/**/*.test.js"
-        - "frontend/**/*.js"
-        - "frontend/**/*.jsx"
-        - "frontend/**/*.test.js"
+    paths:
+      - "backend/**/*.js"
+      - "backend/**/*.test.js"
+      - "frontend/**/*.js"
+      - "frontend/**/*.jsx"
+      - "frontend/**/*.test.js"
   pull_request:
     branches:
       - "*"
     paths:
       - "backend/**/*.js"
-      - "backend/**/*.test.js" 
+      - "backend/**/*.test.js"
       - "frontend/**/*.js"
       - "frontend/**/*.jsx"
       - "frontend/**/*.test.js"
