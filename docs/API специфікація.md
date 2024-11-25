@@ -57,7 +57,6 @@ Content-Type: application/json
 
   ```json
   {
-    "status": "200",
     "message": "User logged in",
     "token": "JWT_TOKEN"
   }
@@ -66,7 +65,6 @@ Content-Type: application/json
 - Помилка
   ```json
   {
-    "status": "404",
     "message": "User not found"
   }
   ```
@@ -111,7 +109,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "201",
   "message": "User successfully registered",
   "token": "JWT_TOKEN"
 }
@@ -121,7 +118,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "400",
   "message": "Email already exists"
 }
 ```
@@ -159,7 +155,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "200",
   "message": "Password reset link sent to email"
 }
 ```
@@ -168,7 +163,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "404",
   "message": "User not found"
 }
 ```
@@ -187,17 +181,16 @@ Content-Type: application/json
 
 **Параметри запиту:**
 
-- `token` — токен з посилання для відновлення
+- `token` — токен з посилання для відновлення (передається через params)
 - `password` — новий пароль
 
 **Приклад запиту:**
 
 ```bash
-POST api/auth/password-change
+POST api/auth/password-change/ee95318bdcbe17b2c056200aef2e4bc9a25d30f23ea1c25b49b7eb660f34a57f
 Content-Type: application/json
 
 {
-    "token": "reset_password_token",
     "password": "NewAb_12345",
 }
 ```
@@ -208,7 +201,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "200",
   "message": "Password successfully changed"
 }
 ```
@@ -217,7 +209,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "400",
   "message": "Invalid or expired token"
 }
 ```
@@ -267,7 +258,6 @@ Content-Type: application/json
 
   ```bash
   {
-  "status": "200",
   "message": "Profile updated successfully"
   }
   ```
@@ -276,7 +266,6 @@ Content-Type: application/json
 
   ```json
   {
-    "status": "400",
     "message": "Invalid data provided"
   }
   ```
@@ -311,7 +300,6 @@ Authorization: Bearer JWT_TOKEN
 
   ```json
   {
-    "status": "200",
     "orders": [
       {
         "id": "12345",
@@ -344,7 +332,6 @@ Authorization: Bearer JWT_TOKEN
 - Помилка:
   ```json
   {
-    "status": "401",
     "message": "Unauthorized"
   }
   ```
@@ -378,7 +365,6 @@ Authorization: Bearer JWT_TOKEN
 
   ```json
   {
-    "status": "200",
     "message": "User account deleted successfully"
   }
   ```
@@ -387,7 +373,6 @@ Authorization: Bearer JWT_TOKEN
 
   ```json
   {
-    "status": "404",
     "message": "User not found"
   }
   ```
@@ -441,7 +426,6 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "status": "201",
   "message": "Product successfully created",
   "data": {
     "id": "1",
@@ -458,7 +442,6 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "status": "400",
   "message": "Invalid product data"
 }
 ```
@@ -507,7 +490,6 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "status": "200",
   "message": "Product successfully updated",
   "data": {
     "id": "1",
@@ -524,7 +506,6 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "status": "404",
   "message": "Product not found"
 }
 ```
@@ -560,7 +541,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "200",
   "message": "Product successfully deleted"
 }
 ```
@@ -569,7 +549,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "404",
   "message": "Product not found"
 }
 ```
@@ -638,7 +617,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "201",
   "message": "Order successfully created",
   "data": {
     "order_id": "12345",
@@ -677,7 +655,6 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "400",
   "message": "Invalid order data",
   "errors": ["Product with id 1 is out of stock", "Invalid phone number format"]
 }
@@ -714,7 +691,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "200",
   "data": {
     "order_id": "12345",
     "created_at": "2024-03-22T10:30:00Z",
@@ -764,7 +740,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "404",
   "message": "Order not found"
 }
 ```
@@ -807,7 +782,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "200",
   "data": {
     "items": [
       {
@@ -853,7 +827,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "400",
   "message": "Invalid date range"
 }
 ```
@@ -897,7 +870,6 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
 
 ```json
 {
-  "status": "200",
   "data": {
     "items": [
       {
@@ -946,7 +918,6 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
 
 ```json
 {
-  "status": "400",
   "message": "Invalid price range"
 }
 ```
@@ -982,7 +953,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "200",
   "data": {
     "order": {
       "id": "12345",
@@ -1069,7 +1039,6 @@ Authorization: Bearer JWT_TOKEN
 
 ```json
 {
-  "status": "404",
   "message": "Order not found"
 }
 ```
