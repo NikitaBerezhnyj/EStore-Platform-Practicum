@@ -5,27 +5,26 @@
     - [POST /api/auth/login](#post-apiauthlogin)
     - [POST /api/auth/register](#post-apiauthregister)
     - [POST /api/auth/password-reset](#post-apiauthpassword-reset)
-    - [POST /api/auth/password-change](#post-apiauthpassword-change)
+    - [POST /api/auth/password-change/{token}](#post-apiauthpassword-changetoken)
   - [Особистий кабінет користувача](#особистий-кабінет-користувача)
-    - [GET /api/user/profile](#get-apiuserprofile)
-    - [PUT /api/user/profile/{id}](#put-apiuserprofileid)
-    - [GET /api/user/orders](#get-apiuserorders)
+    - [GET /api/user/{id}](#get-apiuserid)
+    - [PUT /api/user/{id}](#put-apiuserid)
+    - [GET /api/user/{id}/orders](#get-apiuseridorders)
     - [DELETE /api/user/{id}](#delete-apiuserid)
   - [Товари (для продавця)](#товари-для-продавця)
     - [GET /api/products](#get-apiproducts)
-    - [POST /api/products](#post-apiproducts)
-    - [PUT /api/products/{id}](#put-apiproductsid)
-    - [DELETE /api/products/{id}](#delete-apiproductsid)
+    - [POST /api/product](#post-apiproduct)
+    - [PUT /api/product/{id}](#put-apiproductid)
+    - [DELETE /api/product/{id}](#delete-apiproductid)
   - [Оформлення замовлення](#оформлення-замовлення)
-    - [POST /api/orders](#post-apiorders)
-    - [GET /api/orders/{id}](#get-apiordersid)
+    - [POST /api/order](#post-apiorder)
+    - [GET /api/order/{id}](#get-apiorderid)
   - [Активні замовлення для продавця](#активні-замовлення-для-продавця)
-    - [GET /api/seller/orders](#get-apisellerorders)
-    - [PUT /api/seller/orders/{id}/status](#put-apisellerordersidstatus)
+    - [GET /api/orders/{id}](#get-apiordersid)
   - [Пошук товарів](#пошук-товарів)
     - [GET /api/products/search](#get-apiproductssearch)
   - [Перегляд картки замовлення](#перегляд-картки-замовлення)
-    - [GET /api/orders/{id}/details](#get-apiordersiddetails)
+    - [GET /api/orders/{id}](#get-apiordersid-1)
 
 ## Авторизація та реєстрація
 
@@ -180,7 +179,7 @@ Content-Type: application/json
 - 404 — Користувача не знайдено
 - 500 — Помилка сервера
 
-### POST /api/auth/password-change
+### POST /api/auth/password-change/{token}
 
 **Призначення:** зміна пароля після того, як користувач отримав посилання для відновлення.
 
@@ -232,11 +231,11 @@ Content-Type: application/json
 
 ## Особистий кабінет користувача
 
-### GET /api/user/profile
+### GET /api/user/{id}
 
 **Призначення:** отримання даних профілю користувача (по ID).
 
-### PUT /api/user/profile/{id}
+### PUT /api/user/{id}
 
 **Призначення:** редагування даних профілю користувача.
 
@@ -289,16 +288,20 @@ Content-Type: application/json
 - 401 — Неавторизований доступ.
 - 500 — Помилка сервера.
 
-### GET /api/user/orders
+### GET /api/user/{id}/orders
 
 **Призначення:** отримання історії замовлень користувача.
 
 **Метод:** GET
 
+**Параметри запиту:**
+
+- `{id}` - унікальний ідентифікатор користувача (в URL).
+
 **Приклад запиту:**
 
 ```bash
-GET /api/user/orders
+GET /api/user/{id}/orders
 Authorization: Bearer JWT_TOKEN
 ```
 
@@ -402,7 +405,7 @@ Authorization: Bearer JWT_TOKEN
 
 **Призначення:** отримання списку товарів
 
-### POST /api/products
+### POST /api/product
 
 **Призначення:** додавання нового товару (назва, опис, фото, категорія, ціна, кількість).
 
@@ -419,7 +422,7 @@ Authorization: Bearer JWT_TOKEN
 **Приклад запиту:**
 
 ```bash
-POST api/products
+POST api/product
 Authorization: Bearer JWT_TOKEN
 Content-Type: multipart/form-data
 
@@ -467,7 +470,7 @@ Content-Type: multipart/form-data
 - 401 — Не авторизований
 - 500 — Помилка сервера
 
-### PUT /api/products/{id}
+### PUT /api/product/{id}
 
 **Призначення:** редагування інформації про товар (за ID товару).
 
@@ -475,6 +478,7 @@ Content-Type: multipart/form-data
 
 **Параметри запиту:**
 
+- `id` - унікальний ідентифікатор товару
 - `name` (опціонально) — назва товару
 - `description` (опціонально) — опис товару
 - `photo` (опціонально) — фото товару (файл)
@@ -484,7 +488,7 @@ Content-Type: multipart/form-data
 **Приклад запиту:**
 
 ```bash
-PUT api/products/1
+PUT api/product/1
 Authorization: Bearer JWT_TOKEN
 Content-Type: multipart/form-data
 
@@ -533,7 +537,7 @@ Content-Type: multipart/form-data
 - 404 — Товар не знайдено
 - 500 — Помилка сервера
 
-### DELETE /api/products/{id}
+### DELETE /api/product/{id}
 
 **Призначення:** видалення товару (за ID товару).
 
@@ -546,7 +550,7 @@ Content-Type: multipart/form-data
 **Приклад запиту:**
 
 ```bash
-DELETE api/products/1
+DELETE api/product/1
 Authorization: Bearer JWT_TOKEN
 ```
 
@@ -579,7 +583,7 @@ Authorization: Bearer JWT_TOKEN
 
 ## Оформлення замовлення
 
-### POST /api/orders
+### POST /api/order
 
 **Призначення:** оформлення нового замовлення.
 
@@ -602,7 +606,7 @@ Authorization: Bearer JWT_TOKEN
 **Приклад запиту:**
 
 ```bash
-POST api/orders
+POST api/order
 Authorization: Bearer JWT_TOKEN
 Content-Type: application/json
 
@@ -687,7 +691,7 @@ Content-Type: application/json
 - 422 — Недостатня кількість товару на складі
 - 500 — Помилка сервера
 
-### GET /api/orders/{id}
+### GET /api/order/{id}
 
 **Призначення:** отримання детальної інформації про замовлення (по ID).
 
@@ -700,7 +704,7 @@ Content-Type: application/json
 **Приклад запиту:**
 
 ```bash
-GET api/orders/12345
+GET api/order/12345
 Authorization: Bearer JWT_TOKEN
 ```
 
@@ -775,9 +779,9 @@ Authorization: Bearer JWT_TOKEN
 
 ## Активні замовлення для продавця
 
-### GET /api/seller/orders
+### GET /api/orders/{id}
 
-**Призначення:** отримання списку активних замовлень для продавця.
+**Призначення:** отримання списку замовлень для користувача.
 
 **Метод:** GET
 
@@ -860,93 +864,6 @@ Authorization: Bearer JWT_TOKEN
 - 400 — Некоректні параметри запиту
 - 401 — Не авторизований
 - 403 — Немає прав продавця
-- 500 — Помилка сервера
-
-### PUT /api/seller/orders/{id}/status
-
-**Призначення:** зміна статусу замовлення (наприклад, "Обробляється", "Відправлено").
-
-**Метод:** PUT
-
-**Параметри запиту:**
-
-- `status` — новий статус замовлення:
-  - `pending` — очікує обробки
-  - `processing` — обробляється
-  - `shipped` — відправлено
-  - `delivered` — доставлено
-  - `cancelled` — скасовано
-- `tracking_number` (опціонально) — номер відстеження посилки (обов'язковий для статусу "shipped")
-- `status_comment` (опціонально) — коментар до зміни статусу
-
-**Приклад запиту:**
-
-```bash
-PUT api/seller/orders/12345/status
-Authorization: Bearer JWT_TOKEN
-Content-Type: application/json
-
-{
-    "status": "shipped",
-    "tracking_number": "NP1234567890UA",
-    "status_comment": "Відправлено Новою Поштою"
-}
-```
-
-**Приклад відповіді:**
-
-- Успішно
-
-```json
-{
-  "status": "200",
-  "message": "Order status successfully updated",
-  "data": {
-    "order_id": "12345",
-    "previous_status": "processing",
-    "current_status": "shipped",
-    "updated_at": "2024-03-22T15:30:00Z",
-    "tracking_number": "NP1234567890UA",
-    "status_history": [
-      {
-        "status": "pending",
-        "timestamp": "2024-03-22T10:30:00Z",
-        "comment": null
-      },
-      {
-        "status": "processing",
-        "timestamp": "2024-03-22T10:35:00Z",
-        "comment": "Замовлення прийнято в обробку"
-      },
-      {
-        "status": "shipped",
-        "timestamp": "2024-03-22T15:30:00Z",
-        "comment": "Відправлено Новою Поштою",
-        "tracking_number": "NP1234567890UA"
-      }
-    ]
-  }
-}
-```
-
-- Помилка
-
-```json
-{
-  "status": "400",
-  "message": "Invalid status transition",
-  "details": "Cannot change status from 'delivered' to 'processing'"
-}
-```
-
-**Коди відповіді:**
-
-- 200 — Статус замовлення успішно оновлено
-- 400 — Некоректний статус або перехід між статусами
-- 401 — Не авторизований
-- 403 — Немає прав продавця
-- 404 — Замовлення не знайдено
-- 422 — Відсутній номер відстеження для статусу "shipped"
 - 500 — Помилка сервера
 
 ## Пошук товарів
@@ -1042,7 +959,7 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
 
 ## Перегляд картки замовлення
 
-### GET /api/orders/{id}/details
+### GET /api/orders/{id}
 
 **Призначення:** отримання детальної інформації про замовлення (для покупця і продавця).
 
@@ -1055,7 +972,7 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
 **Приклад запиту:**
 
 ```bash
-GET api/orders/12345/details
+GET api/orders/12345
 Authorization: Bearer JWT_TOKEN
 ```
 

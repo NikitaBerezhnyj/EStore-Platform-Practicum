@@ -30,7 +30,7 @@ router.get("/order/:orderId", async (req, res) => {
 });
 
 // Отримання інформації про всі замовлення користувача
-router.get("/order/:userId", async (req, res) => {
+router.get("/orders/:userId", async (req, res) => {
   try {
     await getUserOrders(req, res);
   } catch (error) {
