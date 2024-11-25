@@ -27,6 +27,7 @@ const validateRegistration = data => {
     name: Joi.string().required().label("Name"),
     email: Joi.string().email().required().label("Email"),
     phone: Joi.string().optional().label("Phone"),
+    role: Joi.string().required().label("Role"),
     password: passwordComplexity().required().label("Password")
   });
   return schema.validate(data);

@@ -1,4 +1,37 @@
 @apiURL = http://localhost:5000/api
 
-### Тест
-POST {{apiURL}}/test
+### Реєстрація
+POST {{apiURL}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Nikita Berezhnyj",
+    "email": "kitnikita06@gmail.com",
+    "password": "Nik_0402",
+    "role": "customer"
+}
+
+### Вхід
+POST {{apiURL}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "kitnikita06@gmail.com",
+    "password": "Ab_12345"
+}
+
+### Надсилання токена для зміни пароля
+POST {{apiURL}}/auth/password-reset
+Content-Type: application/json
+
+{
+    "email": "kitnikita06@gmail.com"
+}
+
+### Зміна пароля
+POST {{apiURL}}/auth/password-change/ee95318bdcbe17b2c056200aef2e4bc9a25d30f23ea1c25b49b7eb660f34a57f
+Content-Type: application/json
+
+{
+    "password": "Nik_0402"
+}

@@ -8,7 +8,16 @@ const createServer = () => {
   const app = express();
 
   // Перевірка необхідних змінних середовища
-  const requiredEnvVars = ["PORT", "HOSTNAME", "ORIGIN_WEBSITE", "DB", "SALT", "JWT_PRIVATE_TOKEN"];
+  const requiredEnvVars = [
+    "PORT",
+    "HOSTNAME",
+    "ORIGIN_WEBSITE",
+    "DB",
+    "SALT",
+    "JWT_PRIVATE_TOKEN",
+    "EMAIL",
+    "PASSWORD"
+  ];
   const missingVars = requiredEnvVars.filter(key => !process.env[key]);
 
   if (missingVars.length > 0) {
