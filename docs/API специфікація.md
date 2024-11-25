@@ -316,7 +316,6 @@ Authorization: Bearer JWT_TOKEN
         "items": [
           {
             "product": "Laptop",
-            "quantity": 1,
             "price": 1000
           }
         ],
@@ -329,7 +328,6 @@ Authorization: Bearer JWT_TOKEN
         "items": [
           {
             "product": "Mouse",
-            "quantity": 2,
             "price": 50
           }
         ],
@@ -417,7 +415,6 @@ Authorization: Bearer JWT_TOKEN
 - `photo` — фото товару (файл)
 - `category` — категорія товару
 - `price` — ціна товару
-- `quantity` — кількість товару на складі
 
 **Приклад запиту:**
 
@@ -600,7 +597,6 @@ Authorization: Bearer JWT_TOKEN
 - `payment_method` — спосіб оплати (card, cash)
 - `items` — масив товарів:
   - `product_id` — ідентифікатор товару
-  - `quantity` — кількість одиниць товару
 - `notes` (опціонально) — примітки до замовлення
 
 **Приклад запиту:**
@@ -623,11 +619,9 @@ Content-Type: application/json
     "items": [
         {
             "product_id": "1",
-            "quantity": 2
         },
         {
             "product_id": "3",
-            "quantity": 1
         }
     ],
     "notes": "Дзвонити за 30 хвилин до доставки"
@@ -661,14 +655,12 @@ Content-Type: application/json
         "product_id": "1",
         "name": "Смартфон XYZ",
         "price": 15000,
-        "quantity": 2,
         "subtotal": 30000
       },
       {
         "product_id": "3",
         "name": "Навушники ABC",
         "price": 14000,
-        "quantity": 1,
         "subtotal": 14000
       }
     ],
@@ -740,14 +732,12 @@ Authorization: Bearer JWT_TOKEN
         "product_id": "1",
         "name": "Смартфон XYZ",
         "price": 15000,
-        "quantity": 2,
         "subtotal": 30000
       },
       {
         "product_id": "3",
         "name": "Навушники ABC",
         "price": 14000,
-        "quantity": 1,
         "subtotal": 14000
       }
     ],
@@ -836,13 +826,11 @@ Authorization: Bearer JWT_TOKEN
           {
             "product_id": "1",
             "name": "Смартфон XYZ",
-            "quantity": 2,
             "subtotal": 30000
           },
           {
             "product_id": "3",
             "name": "Навушники ABC",
-            "quantity": 1,
             "subtotal": 14000
           }
         ],
@@ -1002,7 +990,6 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
         "photo_url": "https://example.com/photos/xyz.jpg",
         "category": "electronics",
         "price": 15000,
-        "quantity": 10,
         "rating": 4.5,
         "reviews_count": 28,
         "relevance_score": 0.95
@@ -1123,7 +1110,6 @@ Authorization: Bearer JWT_TOKEN
         "name": "Смартфон XYZ",
         "photo_url": "https://example.com/photos/xyz.jpg",
         "price": 15000,
-        "quantity": 2,
         "subtotal": 30000
       },
       {
@@ -1131,7 +1117,6 @@ Authorization: Bearer JWT_TOKEN
         "name": "Навушники ABC",
         "photo_url": "https://example.com/photos/abc.jpg",
         "price": 14000,
-        "quantity": 1,
         "subtotal": 14000
       }
     ],
