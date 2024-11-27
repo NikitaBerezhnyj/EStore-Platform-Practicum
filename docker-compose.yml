@@ -27,7 +27,7 @@ services:
     environment:
       - DB=mongodb://estore-mongo:27017/estore
       - REDIS_HOST=estore-redis
-      - REDIS_PORT=6379
+      - REDIS_PORT=6380
     depends_on:
       - estore-mongo
       - estore-redis
@@ -45,7 +45,7 @@ services:
     image: redis:7
     command: ["redis-server", "--loglevel", "warning"]
     ports:
-      - "6379:6379"
+      - "6380:6379"
 
 volumes:
   mongodb_data:
