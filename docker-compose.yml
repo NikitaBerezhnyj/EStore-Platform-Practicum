@@ -5,6 +5,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     ports:
       - "5173:5173"
     depends_on:
@@ -16,12 +19,19 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     ports:
       - "5000:5000"
     environment:
       - DB=mongodb://estore-mongo:27017/estore
+      - REDIS_HOST=estore-redis
+      - REDIS_PORT=6379
     depends_on:
       - estore-mongo
+      - estore-redis
+    command: ["npm", "run", "dev"]
 
   estore-mongo:
     image: mongo:5
@@ -30,6 +40,12 @@ services:
       - "27018:27017"
     volumes:
       - mongodb_data:/data/db
+
+  estore-redis:
+    image: redis:7
+    command: ["redis-server", "--loglevel", "warning"]
+    ports:
+      - "6379:6379"
 
 volumes:
   mongodb_data:
