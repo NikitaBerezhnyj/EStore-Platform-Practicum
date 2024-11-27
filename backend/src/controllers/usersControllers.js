@@ -7,8 +7,7 @@ const {
   validateLogin,
   validatePassword
 } = require("../models/userModel");
-const ResetToken = require("../models/resetTokenModel");
-
+const redisClient = require("../config/redisConfig");
 const transporter = require("../config/mailConfig");
 
 // Реєстрація користувача
@@ -67,7 +66,17 @@ exports.forgotPassword = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-    await ResetToken.create({ token: resetToken, userId: user._id });
+
+    if (!redisClient) {
+      return res.status(500).json({ message: "Redis client not initialized" });
+    }
+
+    redisClient.set(resetToken, user._id.toString(), "EX", 3600, err => {
+      if (err) {
+        console.error("Error storing token in Redis:", err);
+        return res.status(500).json({ message: "Failed to store token in Redis" });
+      }
+    });
 
     const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
     await transporter.sendMail({
@@ -76,7 +85,7 @@ exports.forgotPassword = async (req, res) => {
       text: `You requested a password reset. Please click the following link to reset your password: ${resetURL}`
     });
 
-    res.status(200).json({ message: "Password reset email sent" });
+    res.status(200).json({ message: "Password reset email sent", resetToken: resetToken });
   } catch (error) {
     console.error("Error sending password reset email:", error);
     res.status(500).json({ message: "Error sending password reset email" });
@@ -94,17 +103,21 @@ exports.resetPassword = async (req, res) => {
   if (error) return res.status(400).json({ message: error.details[0].message });
 
   try {
-    const resetToken = await ResetToken.findOne({ token });
-    if (!resetToken) return res.status(400).json({ message: "Invalid or expired token" });
+    const userId = await redisClient.get(token);
 
-    const user = await User.findById(resetToken.userId);
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isSamePassword = await bcrypt.compare(password, user.password);
-    if (isSamePassword)
+    if (isSamePassword) {
       return res.status(400).json({
         message: "New password must be different from the current one."
       });
+    }
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -112,7 +125,8 @@ exports.resetPassword = async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    await resetToken.deleteOne();
+    await redisClient.del(token);
+
     res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error("Error resetting password:", error);

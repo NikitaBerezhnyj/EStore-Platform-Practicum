@@ -17,7 +17,7 @@ Content-Type: application/json
 
 {
     "email": "kitnikita06@gmail.com",
-    "password": "Ab_12345"
+    "password": "Nik_0404"
 }
 
 ### Надсилання токена для зміни пароля
@@ -29,7 +29,8 @@ Content-Type: application/json
 }
 
 ### Зміна пароля
-POST {{apiURL}}/auth/password-change/ee95318bdcbe17b2c056200aef2e4bc9a25d30f23ea1c25b49b7eb660f34a57f
+POST {{apiURL}}/auth/password-change/82cd8dc87216b47103e6450cd980cb80905343cb8ecabe13937e89d8743a6bc6
+
 Content-Type: application/json
 
 {
