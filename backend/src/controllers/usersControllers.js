@@ -7,6 +7,8 @@ const {
   validateLogin,
   validatePassword
 } = require("../models/userModel");
+const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
 const redisClient = require("../config/redisConfig");
 const transporter = require("../config/mailConfig");
 
@@ -154,9 +156,41 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    res.status(201).send({ message: "Test passed!" });
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).send({ message: "User ID is required" });
+    }
+
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const deletedUserId = "deleted_user";
+
+    let deletedUser = await User.findOne({ id: deletedUserId });
+    if (!deletedUser) {
+      deletedUser = new User({
+        id: deletedUserId,
+        name: "Deleted User",
+        email: null,
+        phone: null,
+        password: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      await deletedUser.save();
+    }
+
+    await Order.updateMany({ userId: userId }, { userId: deletedUserId });
+    await Product.updateMany({ userId: userId }, { userId: deletedUserId });
+
+    await User.deleteOne({ id: userId });
+
+    res.status(200).send({ message: "User account deleted successfully" });
   } catch (err) {
-    console.error("Test error:", err);
+    console.error("Error deleting user:", err);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
