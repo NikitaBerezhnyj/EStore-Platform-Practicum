@@ -5,8 +5,8 @@ POST {{apiURL}}/auth/register
 Content-Type: application/json
 
 {
-    "name": "Nikita Berezhnyj",
-    "email": "kitnikita06@gmail.com",
+    "name": "Test User",
+    "email": "donthavenikname@gmail.com",
     "password": "Nik_0402",
     "role": "customer"
 }
@@ -36,3 +36,6 @@ Content-Type: application/json
 {
     "password": "Nik_0402"
 }
+
+### Видалення користувача
+DELETE {{apiURL}}/user/
