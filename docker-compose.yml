@@ -10,8 +10,11 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
+    networks:
+      - estore-network
     depends_on:
       - estore-backend
+    container_name: estore-frontend
 
   estore-backend:
     build:
@@ -24,28 +27,42 @@ services:
       - /app/node_modules
     ports:
       - "5000:5000"
+    networks:
+      - estore-network
     environment:
       - DB=mongodb://estore-mongo:27017/estore
       - REDIS_HOST=estore-redis
-      - REDIS_PORT=6380
+      - REDIS_PORT=6379
     depends_on:
       - estore-mongo
       - estore-redis
     command: ["npm", "run", "dev"]
+    container_name: estore-backend
 
   estore-mongo:
     image: mongo:5
     command: mongod --quiet --logpath /data/db/mongod.log
     ports:
       - "27018:27017"
+    networks:
+      - estore-network
     volumes:
       - mongodb_data:/data/db
+    container_name: estore-mongo
 
   estore-redis:
     image: redis:7
     command: ["redis-server", "--loglevel", "warning"]
     ports:
       - "6380:6379"
+    networks:
+      - estore-network
+    restart: always
+    container_name: estore-redis
 
 volumes:
   mongodb_data:
+
+networks:
+  estore-network:
+    driver: bridge
