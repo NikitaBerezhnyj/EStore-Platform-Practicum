@@ -9,7 +9,6 @@
   - [Особистий кабінет користувача](#особистий-кабінет-користувача)
     - [GET /api/user/{id}](#get-apiuserid)
     - [PUT /api/user/{id}](#put-apiuserid)
-    - [GET /api/user/{id}/orders](#get-apiuseridorders)
     - [DELETE /api/user/{id}](#delete-apiuserid)
   - [Товари (для продавця)](#товари-для-продавця)
     - [GET /api/products](#get-apiproducts)
@@ -226,61 +225,6 @@ Content-Type: application/json
 
 **Призначення:** отримання даних профілю користувача (по ID).
 
-### PUT /api/user/{id}
-
-**Призначення:** редагування даних профілю користувача.
-
-**Метод:** PUT
-
-**Параметри запиту:**
-
-- `{id}` - унікальний ідентифікатор користувача (в URL).
-- `name` — нове ім'я користувача.
-- `email` — новий email користувача.
-- `role` - нова роль користувача.
-
-Приклад запиту:
-
-```bash
-PUT /api/user/profile/{id}
-Content-Type: application/json
-
-{
-  "name": "Jane Doe",
-  "email": "janedoe@example.com",
-  "role": "seller"
-}
-```
-
-**Приклад відповіді:**
-
-- Успішно:
-
-  ```bash
-  {
-  "message": "Profile updated successfully"
-  }
-  ```
-
-- Помилка:
-
-  ```json
-  {
-    "message": "Invalid data provided"
-  }
-  ```
-
-**Коди відповіді:**
-
-- 200 — Дані профілю успішно оновлено.
-- 400 — Некоректні дані.
-- 401 — Неавторизований доступ.
-- 500 — Помилка сервера.
-
-### GET /api/user/{id}/orders
-
-**Призначення:** отримання історії замовлень користувача.
-
 **Метод:** GET
 
 **Параметри запиту:**
@@ -290,7 +234,7 @@ Content-Type: application/json
 **Приклад запиту:**
 
 ```bash
-GET /api/user/{id}/orders
+GET /api/user/{id}
 Authorization: Bearer JWT_TOKEN
 ```
 
@@ -300,6 +244,9 @@ Authorization: Bearer JWT_TOKEN
 
   ```json
   {
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "phone": "+380664122316",
     "orders": [
       {
         "id": "12345",
@@ -339,6 +286,58 @@ Authorization: Bearer JWT_TOKEN
 **Коди відповіді:**
 
 - 200 — Дані про замовлення успішно отримано.
+- 401 — Неавторизований доступ.
+- 500 — Помилка сервера.
+
+### PUT /api/user/{id}
+
+**Призначення:** редагування даних профілю користувача.
+
+**Метод:** PUT
+
+**Параметри запиту:**
+
+- `{id}` - унікальний ідентифікатор користувача (в URL).
+- `name` — нове ім'я користувача.
+- `email` — новий email користувача.
+- `role` - нова роль користувача.
+
+Приклад запиту:
+
+```bash
+PUT /api/user/profile/{id}
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "janedoe@example.com",
+  "phone": "+380501234567",
+  "role": "seller"
+}
+```
+
+**Приклад відповіді:**
+
+- Успішно:
+
+  ```bash
+  {
+  "message": "Profile updated successfully"
+  }
+  ```
+
+- Помилка:
+
+  ```json
+  {
+    "message": "Invalid data provided"
+  }
+  ```
+
+**Коди відповіді:**
+
+- 200 — Дані профілю успішно оновлено.
+- 400 — Некоректні дані.
 - 401 — Неавторизований доступ.
 - 500 — Помилка сервера.
 
@@ -576,7 +575,7 @@ Authorization: Bearer JWT_TOKEN
   - `house_number` — номер будинку
   - `apartment` (опціонально) — номер квартири
   - `recipient_name` — ім'я отримувача
-  - `phone_number` — номер телефону
+  - `phone` — номер телефону
 - `payment_method` — спосіб оплати (card, cash)
 - `items` — масив товарів:
   - `product_id` — ідентифікатор товару
@@ -596,7 +595,7 @@ Content-Type: application/json
         "house_number": "1",
         "apartment": "5",
         "recipient_name": "Іван Петренко",
-        "phone_number": "+380501234567"
+        "phone": "+380501234567"
     },
     "payment_method": "card",
     "items": [
@@ -629,7 +628,7 @@ Content-Type: application/json
       "house_number": "1",
       "apartment": "5",
       "recipient_name": "Іван Петренко",
-      "phone_number": "+380501234567"
+      "phone": "+380501234567"
     },
     "payment_method": "card",
     "items": [
@@ -703,7 +702,7 @@ Authorization: Bearer JWT_TOKEN
       "house_number": "1",
       "apartment": "5",
       "recipient_name": "Іван Петренко",
-      "phone_number": "+380501234567"
+      "phone": "+380501234567"
     },
     "payment_method": "card",
     "payment_status": "paid",

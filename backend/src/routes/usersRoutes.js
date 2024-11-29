@@ -6,8 +6,7 @@ const {
   resetPassword,
   getUserInfo,
   updateUser,
-  deleteUser,
-  getUserOrders
+  deleteUser
 } = require("../controllers/usersControllers");
 
 const router = express.Router();
@@ -78,16 +77,6 @@ router.delete("/user/:userId", async (req, res) => {
     await deleteUser(req, res);
   } catch (error) {
     console.error("Error deleting user: ", error);
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-
-// Отримання всіх замовлень користувача
-router.get("/user/:userId/orders", async (req, res) => {
-  try {
-    await getUserOrders(req, res);
-  } catch (error) {
-    console.error("Error fetching user orders: ", error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });

@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 
 const orderSchema = new mongoose.Schema({
-  user: {
+  customer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
@@ -43,14 +48,23 @@ const orderSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+orderSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
 const Order = mongoose.model("Order", orderSchema);
 
 const validateOrder = data => {
   const schema = Joi.object({
-    user: Joi.string()
+    customer: Joi.string()
       .pattern(/^[0-9a-fA-F]{24}$/)
       .required()
-      .label("User ID"),
+      .label("Customer ID"),
+    seller: Joi.string()
+      .pattern(/^[0-9a-fA-F]{24}$/)
+      .required()
+      .label("Seller ID"),
     date: Joi.date().optional().label("Order Date"),
     items: Joi.array()
       .items(
@@ -72,16 +86,19 @@ const validateOrder = data => {
       .optional()
       .label("Order Status")
   });
-
   return schema.validate(data);
 };
 
 const validateOrderUpdate = data => {
   const schema = Joi.object({
-    user: Joi.string()
+    customer: Joi.string()
       .pattern(/^[0-9a-fA-F]{24}$/)
-      .optional()
-      .label("User ID"),
+      .required()
+      .label("Customer ID"),
+    seller: Joi.string()
+      .pattern(/^[0-9a-fA-F]{24}$/)
+      .required()
+      .label("Seller ID"),
     date: Joi.date().optional().label("Order Date"),
     items: Joi.array()
       .items(
@@ -102,7 +119,6 @@ const validateOrderUpdate = data => {
       .optional()
       .label("Order Status")
   });
-
   return schema.validate(data);
 };
 

@@ -30,11 +30,24 @@ Content-Type: application/json
 
 ### Зміна пароля
 POST {{apiURL}}/auth/password-change/82cd8dc87216b47103e6450cd980cb80905343cb8ecabe13937e89d8743a6bc6
-
 Content-Type: application/json
 
 {
     "password": "Nik_0402"
+}
+
+### Отримання інформації про користувача
+GET  {{apiURL}}/user/674a20082f2ac342ca1e2086
+
+### Оновлення даних користувача
+PUT {{apiURL}}/user/674a20082f2ac342ca1e2086
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "janedoe@example.com",
+  "phone": "+380501234567",
+  "role": "seller"
 }
 
 ### Видалення користувача

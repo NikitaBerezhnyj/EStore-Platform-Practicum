@@ -7,8 +7,8 @@ const {
   validateLogin,
   validatePassword
 } = require("../models/userModel");
-const Order = require("../models/orderModel");
-const Product = require("../models/productModel");
+const { Order } = require("../models/orderModel");
+const { Product } = require("../models/productModel");
 const redisClient = require("../config/redisConfig");
 const transporter = require("../config/mailConfig");
 
@@ -138,18 +138,82 @@ exports.resetPassword = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
   try {
-    res.status(201).send({ message: "Test passed!" });
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).select("name email phone role");
+    if (!user) {
+      return res.status(404).send({ message: "User not found." });
+    }
+
+    // Отримуємо замовлення користувача
+    const orders = await Order.find({ customer: userId }) // Використовується 'customer', а не 'user'
+      .select("date items total status")
+      .populate({
+        path: "items.product",
+        select: "name"
+      });
+
+    // Форматуємо замовлення для відповіді
+    const formattedOrders = orders.map(order => ({
+      id: order._id,
+      date: order.date,
+      items: order.items.map(item => ({
+        product: item.product.name, // Отримуємо назву продукту
+        price: item.price,
+        quantity: item.quantity
+      })),
+      total: order.total,
+      status: order.status
+    }));
+
+    res.status(200).send({
+      name: user.name,
+      email: user.email,
+      phone: user.phone || null,
+      orders: formattedOrders
+    });
   } catch (err) {
-    console.error("Test error:", err);
+    console.error("Error fetching user info:", err);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
 
 exports.updateUser = async (req, res) => {
   try {
-    res.status(201).send({ message: "Test passed!" });
+    const { name, email, phone, role } = req.body;
+    const { userId } = req.params;
+
+    if (!name || !email || !role) {
+      return res.status(400).send({ message: "Invalid data provided" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).send({ message: "Invalid email format" });
+    }
+
+    if (phone && !/^(\+?\d{1,4}[\s-]?)?(\(?\d{1,3}\)?[\s-]?)?[\d\s-]{7,}$/.test(phone)) {
+      return res.status(400).send({ message: "Invalid phone format" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    user.name = name;
+    user.email = email;
+    user.role = role;
+
+    if (phone) {
+      user.phone = phone;
+    }
+
+    await user.save();
+
+    res.status(200).send({ message: "Profile updated successfully" });
   } catch (err) {
-    console.error("Test error:", err);
+    console.error("Error updating user:", err);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -191,15 +255,6 @@ exports.deleteUser = async (req, res) => {
     res.status(200).send({ message: "User account deleted successfully" });
   } catch (err) {
     console.error("Error deleting user:", err);
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-};
-
-exports.getUserOrders = async (req, res) => {
-  try {
-    res.status(201).send({ message: "Test passed!" });
-  } catch (err) {
-    console.error("Test error:", err);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
