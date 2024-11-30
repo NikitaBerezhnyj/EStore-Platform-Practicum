@@ -22,8 +22,8 @@ exports.registerUser = async (req, res) => {
     if (userEmail)
       return res.status(409).send({ message: "User with given email already exists!" });
 
-    const userUsername = await User.findOne({ username: req.body.username });
-    if (userUsername)
+    const userUsername = await User.findOne({ username: req.body.name });
+    if (userUsername != null)
       return res.status(409).send({ message: "User with given username already exists!" });
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
@@ -136,36 +136,112 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+// Отримання інформації про користувача
+// exports.getUserInfo = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+
+//     const user = await User.findById(userId).select("name email phone role");
+//     if (!user) {
+//       return res.status(404).send({ message: "User not found." });
+//     }
+
+//     let orders;
+
+//     if (user.role === "customer") {
+//       orders = await Order.find({ customer: userId }).select("date items total status").populate({
+//         path: "items.product",
+//         select: "name"
+//       });
+//     } else if (user.role === "seller") {
+//       orders = await Order.find({ seller: userId }).select("date items total status").populate({
+//         path: "items.product",
+//         select: "name"
+//       });
+//     } else {
+//       return res.status(400).send({ message: "Invalid role" });
+//     }
+
+//     const formattedOrders = orders.map(order => ({
+//       id: order._id,
+//       date: order.date,
+//       items: order.items.map(item => ({
+//         product: item.product.name,
+//         price: item.price,
+//         quantity: item.quantity
+//       })),
+//       total: order.total,
+//       status: order.status
+//     }));
+
+//     res.status(200).send({
+//       name: user.name,
+//       email: user.email,
+//       phone: user.phone || null,
+//       orders: formattedOrders
+//     });
+//   } catch (err) {
+//     console.error("Error fetching user info:", err);
+//     res.status(500).send({ message: "Internal Server Error" });
+//   }
+// };
+
 exports.getUserInfo = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    // Пошук користувача по ID
     const user = await User.findById(userId).select("name email phone role");
     if (!user) {
       return res.status(404).send({ message: "User not found." });
     }
 
-    // Отримуємо замовлення користувача
-    const orders = await Order.find({ customer: userId }) // Використовується 'customer', а не 'user'
-      .select("date items total status")
-      .populate({
-        path: "items.product",
-        select: "name"
-      });
+    let orders;
 
-    // Форматуємо замовлення для відповіді
+    // Пошук замовлень в залежності від ролі користувача
+    if (user.role === "customer") {
+      orders = await Order.find({ customer: userId })
+        .select("date items total status delivery_address payment_method notes")
+        .populate({
+          path: "items.product",
+          select: "name price"
+        });
+    } else if (user.role === "seller") {
+      orders = await Order.find({ seller: userId })
+        .select("date items total status delivery_address payment_method notes")
+        .populate({
+          path: "items.product",
+          select: "name price"
+        });
+    } else {
+      return res.status(400).send({ message: "Invalid role" });
+    }
+
+    // Форматування замовлень для відповіді
     const formattedOrders = orders.map(order => ({
       id: order._id,
       date: order.date,
       items: order.items.map(item => ({
-        product: item.product.name, // Отримуємо назву продукту
-        price: item.price,
-        quantity: item.quantity
+        product: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        totalItemPrice: item.product.price * item.quantity // Додавання вартості товару в замовленні
       })),
       total: order.total,
-      status: order.status
+      status: order.status,
+      delivery_address: {
+        city: order.delivery_address.city,
+        street: order.delivery_address.street,
+        house_number: order.delivery_address.house_number,
+        apartment: order.delivery_address.apartment,
+        recipient_name: order.delivery_address.recipient_name,
+        phone: order.delivery_address.phone
+      },
+      payment_method: order.payment_method,
+      notes: order.notes || "No notes provided" // Примітки до замовлення, якщо є
     }));
 
+    // Відправлення відповіді
     res.status(200).send({
       name: user.name,
       email: user.email,
@@ -178,6 +254,7 @@ exports.getUserInfo = async (req, res) => {
   }
 };
 
+// Оновлення даних користувача
 exports.updateUser = async (req, res) => {
   try {
     const { name, email, phone, role } = req.body;
@@ -218,6 +295,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// Видалення користувача
 exports.deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
