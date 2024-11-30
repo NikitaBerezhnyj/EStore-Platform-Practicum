@@ -2,7 +2,6 @@ const express = require("express");
 const {
   createOrder,
   getOrder,
-  getUserOrders,
   updateOrder,
   deleteOrder
 } = require("../controllers/ordersControllers");
@@ -25,16 +24,6 @@ router.get("/order/:orderId", async (req, res) => {
     await getOrder(req, res);
   } catch (error) {
     console.error("Error fetching order: ", error);
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-
-// Отримання інформації про всі замовлення користувача
-router.get("/orders/:userId", async (req, res) => {
-  try {
-    await getUserOrders(req, res);
-  } catch (error) {
-    console.error("Error fetching user orders: ", error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });

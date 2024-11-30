@@ -17,6 +17,23 @@ const orderSchema = new mongoose.Schema({
     default: Date.now,
     required: true
   },
+  delivery_address: {
+    city: { type: String, required: true },
+    street: { type: String, required: true },
+    house_number: { type: String, required: true },
+    apartment: { type: String, default: null },
+    recipient_name: { type: String, required: true },
+    phone: { type: String, required: true }
+  },
+  payment_method: {
+    type: String,
+    enum: ["card", "cash"],
+    required: true
+  },
+  payment_status: {
+    type: Boolean,
+    default: false
+  },
   items: [
     {
       product: {
@@ -24,20 +41,21 @@ const orderSchema = new mongoose.Schema({
         ref: "Product",
         required: true
       },
-      price: {
-        type: Number,
-        required: true
-      },
       quantity: {
         type: Number,
-        default: 1,
-        required: true
+        required: true,
+        min: 1
       }
     }
   ],
+  notes: {
+    type: String,
+    default: null
+  },
   total: {
     type: Number,
-    required: true
+    required: true,
+    min: 1
   },
   status: {
     type: String,
@@ -66,6 +84,19 @@ const validateOrder = data => {
       .required()
       .label("Seller ID"),
     date: Joi.date().optional().label("Order Date"),
+    delivery_address: Joi.object({
+      city: Joi.string().required().label("City"),
+      street: Joi.string().required().label("Street"),
+      house_number: Joi.string().required().label("House Number"),
+      apartment: Joi.string().optional().allow(null).label("Apartment"),
+      recipient_name: Joi.string().required().label("Recipient Name"),
+      phone: Joi.string()
+        .pattern(/^\+380\d{9}$/)
+        .required()
+        .label("Phone")
+    }).required(),
+    payment_method: Joi.string().valid("card", "cash").required().label("Payment Method"),
+    payment_status: Joi.bool().default(false).label("Payment Status"),
     items: Joi.array()
       .items(
         Joi.object({
@@ -73,47 +104,14 @@ const validateOrder = data => {
             .pattern(/^[0-9a-fA-F]{24}$/)
             .required()
             .label("Product ID"),
-          price: Joi.number().required().min(0).label("Price"),
-          quantity: Joi.number().required().min(1).label("Quantity")
+          quantity: Joi.number().integer().min(1).required().label("Quantity")
         })
       )
       .min(1)
       .required()
       .label("Items"),
-    total: Joi.number().required().min(0).label("Total Price"),
-    status: Joi.string()
-      .valid("Pending", "In Progress", "Delivered", "Cancelled")
-      .optional()
-      .label("Order Status")
-  });
-  return schema.validate(data);
-};
-
-const validateOrderUpdate = data => {
-  const schema = Joi.object({
-    customer: Joi.string()
-      .pattern(/^[0-9a-fA-F]{24}$/)
-      .required()
-      .label("Customer ID"),
-    seller: Joi.string()
-      .pattern(/^[0-9a-fA-F]{24}$/)
-      .required()
-      .label("Seller ID"),
-    date: Joi.date().optional().label("Order Date"),
-    items: Joi.array()
-      .items(
-        Joi.object({
-          product: Joi.string()
-            .pattern(/^[0-9a-fA-F]{24}$/)
-            .optional()
-            .label("Product ID"),
-          price: Joi.number().optional().min(0).label("Price"),
-          quantity: Joi.number().optional().min(1).label("Quantity")
-        })
-      )
-      .optional()
-      .label("Items"),
-    total: Joi.number().optional().min(0).label("Total Price"),
+    notes: Joi.string().optional().allow(null).label("Notes"),
+    total: Joi.number().integer().min(1).required().label("Total"),
     status: Joi.string()
       .valid("Pending", "In Progress", "Delivered", "Cancelled")
       .optional()
@@ -124,6 +122,5 @@ const validateOrderUpdate = data => {
 
 module.exports = {
   Order,
-  validateOrder,
-  validateOrderUpdate
+  validateOrder
 };
