@@ -3,6 +3,9 @@ const cors = require("cors");
 const path = require("path");
 const serverStatusRoutes = require("../routes/serverStatusRoutes");
 const usersRoutes = require("../routes/usersRoutes");
+const productRoutes = require("../routes/productsRoutes");
+const orderRoutes = require("../routes/ordersRoutes");
+const uploadRoutes = require("../routes/uploadRoutes");
 
 const createServer = () => {
   const app = express();
@@ -34,15 +37,18 @@ const createServer = () => {
   // Підключення роутерів
   app.use("/api", serverStatusRoutes);
   app.use("/api", usersRoutes);
+  app.use("/api", productRoutes);
+  app.use("/api", orderRoutes);
+  app.use("/api", uploadRoutes);
 
   // Статичні файли (наприклад, для зображень чи інших ресурсів)
-  app.use("/static", express.static(path.join(__dirname, "..", "static")));
+  app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
   // Відправлення вашого клієнтського застосунку
-  app.use(express.static(path.join(__dirname, "..", "..", "build")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "..", "build", "index.html"));
-  });
+  // app.use(express.static(path.join(__dirname, "..", "..", "build")));
+  // app.get("*", (req, res) => {
+  //   res.sendFile(path.join(__dirname, "..", "..", "build", "index.html"));
+  // });
 
   return app;
 };
