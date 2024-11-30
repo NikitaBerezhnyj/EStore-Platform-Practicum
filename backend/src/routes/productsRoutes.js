@@ -5,7 +5,7 @@ const {
   updateProduct,
   deleteProduct,
   getAllProducts,
-  searchProduct
+  searchProducts
 } = require("../controllers/productsControllers");
 
 const router = express.Router();
@@ -61,9 +61,9 @@ router.get("/products", async (req, res) => {
 });
 
 // Пошук продуктів
-router.post("/products/search", async (req, res) => {
+router.get("/products/search", async (req, res) => {
   try {
-    await searchProduct(req, res);
+    await searchProducts(req, res);
   } catch (error) {
     console.error("Error searching product: ", error);
     res.status(500).send({ message: "Internal Server Error" });
