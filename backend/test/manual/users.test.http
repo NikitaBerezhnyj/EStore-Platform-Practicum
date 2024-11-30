@@ -5,8 +5,8 @@ POST {{apiURL}}/auth/register
 Content-Type: application/json
 
 {
-    "name": "Test User",
-    "email": "donthavenikname@gmail.com",
+    "name": "Nikita Berehznyj",
+    "email": "kitnikita06@gmail.com",
     "password": "Nik_0402",
     "role": "customer"
 }
@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### Отримання інформації про користувача
-GET  {{apiURL}}/user/674a20082f2ac342ca1e2086
+GET {{apiURL}}/user/674a20082f2ac342ca1e2086
 
 ### Оновлення даних користувача
 PUT {{apiURL}}/user/674a20082f2ac342ca1e2086

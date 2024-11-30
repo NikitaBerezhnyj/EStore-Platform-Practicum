@@ -1,1 +1,59 @@
 @apiURL = http://localhost:5000/api
+
+### Додання нового замовлення
+POST {{apiURL}}/order
+Content-Type: application/json
+
+{
+    "customer": "674a2c6f263cd170a24337f7",
+    "seller": "674a20082f2ac342ca1e2086",
+    "delivery_address": {
+        "city": "Київ",
+        "street": "вул. Хрещатик",
+        "house_number": "1",
+        "apartment": "5",
+        "recipient_name": "Іван Петренко",
+        "phone": "+380501234567"
+    },
+    "payment_method": "cash",
+    "items": [
+        {
+            "product": "674b4130d610f247670ab1ce",
+            "quantity": 2
+        }
+    ],
+    "total": 200,
+    "status": "Pending"
+}
+
+### Отримання інформації про замовлення
+GET {{apiURL}}/order/674b66b66da6cecb5d5c29a5
+
+### Оновлення інформації про замовлення
+PUT {{apiURL}}/order/674b5f543b37d0eae85e7f48
+Content-Type: application/json
+
+{
+    "customer": "674a2c6f263cd170a24337f7",
+    "seller": "674a20082f2ac342ca1e2086",
+    "delivery_address": {
+        "city": "Київ",
+        "street": "вул. Хрещатик",
+        "house_number": "1",
+        "apartment": "5",
+        "recipient_name": "Іван Петренко",
+        "phone": "+380501234567"
+    },
+    "payment_method": "card",
+    "items": [
+        {
+            "product": "674b4130d610f247670ab1ce",
+            "quantity": 2
+        }
+    ],
+    "total": 200,
+    "status": "Pending"
+}
+
+### Видалення замовлення
+DELETE {{apiURL}}/order/674b5f543b37d0eae85e7f48

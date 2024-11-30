@@ -1,1 +1,42 @@
 @apiURL = http://localhost:5000/api
+
+### Створення нового продукту
+POST {{apiURL}}/product
+Content-Type: application/json
+
+{
+    "seller_id": "674a20082f2ac342ca1e2086",
+    "name": "Смартфон XYZ",
+    "description": "Новий смартфон з потужним процесором",
+    "photo_url": "http://localhost:5000/uploads/products/photo.jpg",
+    "category": "electronics",
+    "price": 15000,
+    "quantity": 10
+}
+
+### Отримання всіх продуктів
+GET {{apiURL}}/products
+
+### Отримання інформації про продукт за ID
+GET {{apiURL}}/product/674b4130d610f247670ab1ce
+
+### Пошук продуктів
+GET {{apiURL}}/products/search?q=смартфон&category=electronics&min_price=10000&max_price=20000
+
+### Оновлення продукту
+PUT {{apiURL}}/product/674b4130d610f247670ab1ce
+Content-Type: application/json
+
+{
+    "seller_id": "674a20082f2ac342ca1e2086",
+    "name": "Смартфон XYZ Pro",
+    "description": "Оновлений смартфон з потужним процесором",
+    "photo_url": "http://localhost:5000/uploads/products/photo_updated.jpg",
+    "category": "electronics",
+    "price": 18000,
+    "quantity": 5
+}
+
+### Видалення продукту
+DELETE {{apiURL}}/product/674b4136d610f247670ab1d1
+
