@@ -10,20 +10,20 @@
     - [GET /api/user/{id}](#get-apiuserid)
     - [PUT /api/user/{id}](#put-apiuserid)
     - [DELETE /api/user/{id}](#delete-apiuserid)
-  - [Товари (для продавця)](#товари-для-продавця)
-    - [GET /api/products](#get-apiproducts)
+  - [Товари](#товари)
     - [POST /api/product](#post-apiproduct)
+    - [GET /api/product/{id}](#get-apiproductid)
+    - [GET /api/products](#get-apiproducts)
     - [PUT /api/product/{id}](#put-apiproductid)
     - [DELETE /api/product/{id}](#delete-apiproductid)
-  - [Оформлення замовлення](#оформлення-замовлення)
+  - [Замовлення](#замовлення)
     - [POST /api/order](#post-apiorder)
     - [GET /api/order/{id}](#get-apiorderid)
-  - [Активні замовлення для продавця](#активні-замовлення-для-продавця)
-    - [GET /api/orders/{id}](#get-apiordersid)
+    - [DELETE /api/order/{id}](#delete-apiorderid)
   - [Пошук товарів](#пошук-товарів)
     - [GET /api/products/search](#get-apiproductssearch)
-  - [Перегляд картки замовлення](#перегляд-картки-замовлення)
-    - [GET /api/orders/{id}](#get-apiordersid-1)
+  - [Завантаження зображень](#завантаження-зображень)
+    - [POST /api/upload](#post-apiupload)
 
 ## Авторизація та реєстрація
 
@@ -235,7 +235,6 @@ Content-Type: application/json
 
 ```bash
 GET /api/user/{id}
-Authorization: Bearer JWT_TOKEN
 ```
 
 **Приклад відповіді:**
@@ -244,33 +243,57 @@ Authorization: Bearer JWT_TOKEN
 
   ```json
   {
-    "name": "John Doe",
-    "email": "johndoe@example.com",
-    "phone": "+380664122316",
+    "name": "Alex Smith",
+    "email": "alexsmith@example.com",
+    "phone": "+380673244890",
     "orders": [
       {
-        "id": "12345",
-        "date": "2024-11-20",
+        "id": "b213f8e7a8b13d4c975e8d7b",
+        "date": "2024-11-15T14:32:45.123Z",
         "items": [
           {
-            "product": "Laptop",
-            "price": 1000
+            "product": "Smartwatch Alpha",
+            "price": 2500,
+            "quantity": 1,
+            "totalItemPrice": 2500
           }
         ],
-        "total": 1000,
-        "status": "Delivered"
+        "total": 2500,
+        "status": "Delivered",
+        "delivery_address": {
+          "city": "Одеса",
+          "street": "вул. Дерибасівська",
+          "house_number": "12",
+          "apartment": "3",
+          "recipient_name": "Олексій Степанов",
+          "phone": "+380673244890"
+        },
+        "payment_method": "card",
+        "notes": "Leave at the door"
       },
       {
-        "id": "12346",
-        "date": "2024-11-18",
+        "id": "e4327f9a7b2c44d8a4c6d9f4",
+        "date": "2024-11-10T10:25:30.456Z",
         "items": [
           {
-            "product": "Mouse",
-            "price": 50
+            "product": "Bluetooth Earphones Pro",
+            "price": 900,
+            "quantity": 2,
+            "totalItemPrice": 1800
           }
         ],
-        "total": 100,
-        "status": "In Progress"
+        "total": 1800,
+        "status": "In Progress",
+        "delivery_address": {
+          "city": "Львів",
+          "street": "вул. Шевченка",
+          "house_number": "23",
+          "apartment": "7",
+          "recipient_name": "Марина Іванова",
+          "phone": "+380673244891"
+        },
+        "payment_method": "cash",
+        "notes": "Delivery after 5 PM"
       }
     ]
   }
@@ -355,7 +378,6 @@ Content-Type: application/json
 
 ```bash
 DELETE /api/user/12345
-Authorization: Bearer JWT_TOKEN
 ```
 
 **Приклад відповіді:**
@@ -383,11 +405,7 @@ Authorization: Bearer JWT_TOKEN
 - 404 — Користувача не знайдено.
 - 500 — Помилка сервера.
 
-## Товари (для продавця)
-
-### GET /api/products
-
-**Призначення:** отримання списку товарів
+## Товари
 
 ### POST /api/product
 
@@ -397,9 +415,10 @@ Authorization: Bearer JWT_TOKEN
 
 **Параметри запиту:**
 
+- `seller_id` - id продавця, який створив продукт
 - `name` — назва товару
 - `description` — опис товару
-- `photo` — фото товару (файл)
+- `photo_url` — посилання на фото збереженого на сервері
 - `category` — категорія товару
 - `price` — ціна товару
 
@@ -407,13 +426,13 @@ Authorization: Bearer JWT_TOKEN
 
 ```bash
 POST api/product
-Authorization: Bearer JWT_TOKEN
 Content-Type: multipart/form-data
 
 {
+    "seller_id": "1",
     "name": "Смартфон XYZ",
     "description": "Новий смартфон з потужним процесором",
-    "photo": [файл],
+    "photo_url": "http:localhost:5000/uploads/products/photos.jpg",
     "category": "electronics",
     "price": 15000
 }
@@ -425,15 +444,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "message": "Product successfully created",
-  "data": {
-    "id": "1",
-    "name": "Смартфон XYZ",
-    "description": "Новий смартфон з потужним процесором",
-    "photo_url": "https://example.com/photos/xyz.jpg",
-    "category": "electronics",
-    "price": 15000
-  }
+  "message": "Product successfully created"
 }
 ```
 
@@ -452,6 +463,127 @@ Content-Type: multipart/form-data
 - 401 — Не авторизований
 - 500 — Помилка сервера
 
+### GET /api/product/{id}
+
+**Призначення:** Отримання товару за id.
+
+**Метод:** GET
+
+**Параметри запиту:**
+
+- `id` — ідентифікатор товару (обов'язковий параметр).
+
+**Приклад запиту:**
+
+```bash
+GET /api/product/1
+```
+
+**Приклад відповіді:**
+
+- Успішно:
+
+```json
+{
+  "_id": "1",
+  "seller_id": "1",
+  "name": "Смартфон XYZ Pro",
+  "description": "Оновлений смартфон з потужним процесором",
+  "photo_url": "http://localhost:5000/uploads/products/photo.jpg",
+  "category": "electronics",
+  "price": 18000,
+  "createdAt": "2024-11-30T16:45:36.260Z",
+  "updatedAt": "2024-11-30T16:45:36.263Z",
+  "__v": 0
+}
+```
+
+- Помилка (товар не знайдено):
+
+```json
+{
+  "message": "Product not found"
+}
+```
+
+- Помилка (відсутній `id`):
+
+```json
+{
+  "message": "Product ID is required"
+}
+```
+
+**Коди відповіді:**
+
+- 200 — Товар знайдено.
+- 400 — Некоректні параметри запиту (відсутній `id`).
+- 404 — Товар не знайдено.
+- 500 — Помилка сервера.
+
+### GET /api/products
+
+**Призначення:** Отримання всіх товарів.
+
+**Метод:** GET
+
+**Параметри запиту:**
+
+- Немає параметрів запиту.
+
+**Приклад запиту:**
+
+```bash
+GET /api/products
+```
+
+**Приклад відповіді:**
+
+- Успішно:
+
+```json
+[
+  {
+    "_id": "1",
+    "seller_id": "1",
+    "name": "Смартфон XYZ Pro",
+    "description": "Оновлений смартфон з потужним процесором",
+    "photo_url": "http://localhost:5000/uploads/products/photo_updated.jpg",
+    "category": "electronics",
+    "price": 18000,
+    "createdAt": "2024-11-30T16:45:36.260Z",
+    "updatedAt": "2024-11-30T16:45:36.263Z",
+    "__v": 0
+  },
+  {
+    "_id": "2",
+    "seller_id": "1",
+    "name": "Смартфон XYZ",
+    "description": "Новий смартфон з потужним процесором",
+    "photo_url": "http://localhost:5000/uploads/products/photo.jpg",
+    "category": "electronics",
+    "price": 15000,
+    "createdAt": "2024-11-30T18:41:38.266Z",
+    "updatedAt": "2024-11-30T18:41:38.271Z",
+    "__v": 0
+  }
+]
+```
+
+- Помилка (немає товарів):
+
+```json
+{
+  "message": "No products found"
+}
+```
+
+**Коди відповіді:**
+
+- 200 — Успішно знайдено товари.
+- 404 — Товари не знайдено.
+- 500 — Помилка сервера.
+
 ### PUT /api/product/{id}
 
 **Призначення:** редагування інформації про товар (за ID товару).
@@ -460,24 +592,25 @@ Content-Type: multipart/form-data
 
 **Параметри запиту:**
 
+- `seller_id` - id продавця, який створив продукт
 - `id` - унікальний ідентифікатор товару
-- `name` (опціонально) — назва товару
-- `description` (опціонально) — опис товару
-- `photo` (опціонально) — фото товару (файл)
-- `category` (опціонально) — категорія товару
-- `price` (опціонально) — ціна товару
+- `name` — назва товару
+- `description` — опис товару
+- `photo_url` — посилання на зображення збережене на сервері
+- `category` — категорія товару
+- `price` — ціна товару
 
 **Приклад запиту:**
 
 ```bash
 PUT api/product/1
-Authorization: Bearer JWT_TOKEN
 Content-Type: multipart/form-data
 
 {
+  "seller_id": "1",
   "name": "Смартфон XYZ",
   "description": "Новий смартфон з потужним процесором",
-  "photo": [файл],
+  "photo_url": "http:localhost:5000/uploads/products/photos.jpg",
   "category": "electronics",
   "price": 14000,
 }
@@ -489,15 +622,7 @@ Content-Type: multipart/form-data
 
 ```json
 {
-  "message": "Product successfully updated",
-  "data": {
-    "id": "1",
-    "name": "Смартфон XYZ",
-    "description": "Новий смартфон з потужним процесором",
-    "photo_url": "https://example.com/photos/xyz.jpg",
-    "category": "electronics",
-    "price": 14000
-  }
+  "message": "Product successfully updated"
 }
 ```
 
@@ -531,7 +656,6 @@ Content-Type: multipart/form-data
 
 ```bash
 DELETE api/product/1
-Authorization: Bearer JWT_TOKEN
 ```
 
 **Приклад відповіді:**
@@ -559,7 +683,7 @@ Authorization: Bearer JWT_TOKEN
 - 404 — Товар не знайдено
 - 500 — Помилка сервера
 
-## Оформлення замовлення
+## Замовлення
 
 ### POST /api/order
 
@@ -585,28 +709,31 @@ Authorization: Bearer JWT_TOKEN
 
 ```bash
 POST api/order
-Authorization: Bearer JWT_TOKEN
 Content-Type: application/json
+```
 
+```json
 {
-    "delivery_address": {
-        "city": "Київ",
-        "street": "вул. Хрещатик",
-        "house_number": "1",
-        "apartment": "5",
-        "recipient_name": "Іван Петренко",
-        "phone": "+380501234567"
-    },
-    "payment_method": "card",
-    "items": [
-        {
-            "product_id": "1",
-        },
-        {
-            "product_id": "3",
-        }
-    ],
-    "notes": "Дзвонити за 30 хвилин до доставки"
+  "customer": "2",
+  "seller": "1",
+  "delivery_address": {
+    "city": "Київ",
+    "street": "вул. Хрещатик",
+    "house_number": "1",
+    "apartment": "5",
+    "recipient_name": "Іван Петренко",
+    "phone": "+380501234567"
+  },
+  "payment_method": "cash",
+  "items": [
+    {
+      "product": "1",
+      "quantity": 2
+    }
+  ],
+  "total": 200,
+  "status": "Pending",
+  "note": "Зателефонуйте за 30 хвилин до доставки"
 }
 ```
 
@@ -616,37 +743,7 @@ Content-Type: application/json
 
 ```json
 {
-  "message": "Order successfully created",
-  "data": {
-    "order_id": "12345",
-    "created_at": "2024-03-22T10:30:00Z",
-    "status": "pending",
-    "total_amount": 44000,
-    "delivery_address": {
-      "city": "Київ",
-      "street": "вул. Хрещатик",
-      "house_number": "1",
-      "apartment": "5",
-      "recipient_name": "Іван Петренко",
-      "phone": "+380501234567"
-    },
-    "payment_method": "card",
-    "items": [
-      {
-        "product_id": "1",
-        "name": "Смартфон XYZ",
-        "price": 15000,
-        "subtotal": 30000
-      },
-      {
-        "product_id": "3",
-        "name": "Навушники ABC",
-        "price": 14000,
-        "subtotal": 14000
-      }
-    ],
-    "notes": "Дзвонити за 30 хвилин до доставки"
-  }
+  "message": "Order successfully created"
 }
 ```
 
@@ -654,8 +751,7 @@ Content-Type: application/json
 
 ```json
 {
-  "message": "Invalid order data",
-  "errors": ["Product with id 1 is out of stock", "Invalid phone number format"]
+  "message": "Invalid order data"
 }
 ```
 
@@ -681,7 +777,6 @@ Content-Type: application/json
 
 ```bash
 GET api/order/12345
-Authorization: Bearer JWT_TOKEN
 ```
 
 **Приклад відповіді:**
@@ -705,7 +800,7 @@ Authorization: Bearer JWT_TOKEN
       "phone": "+380501234567"
     },
     "payment_method": "card",
-    "payment_status": "paid",
+    "payment_status": false,
     "items": [
       {
         "product_id": "1",
@@ -751,92 +846,46 @@ Authorization: Bearer JWT_TOKEN
 - 404 — Замовлення не знайдено
 - 500 — Помилка сервера
 
-## Активні замовлення для продавця
+### DELETE /api/order/{id}
 
-### GET /api/orders/{id}
+**Призначення:** видалити замовлення (за ID).
 
-**Призначення:** отримання списку замовлень для користувача.
+**Метод:** DELETE
 
-**Метод:** GET
+**Параметри запиту:**
 
-**Параметри запиту (query parameters):**
-
-- `status` (опціонально) — фільтр за статусом замовлення (pending, processing, shipped, delivered, cancelled)
-- `date_from` (опціонально) — фільтр за датою (від)
-- `date_to` (опціонально) — фільтр за датою (до)
-- `sort` (опціонально) — сортування (date_asc, date_desc, amount_asc, amount_desc)
-- `page` (опціонально) — номер сторінки (за замовчуванням: 1)
-- `limit` (опціонально) — кількість замовлень на сторінці (за замовчуванням: 10)
+- `{id}` — унікальний ідентифікатор замовлення (в URL).
 
 **Приклад запиту:**
 
 ```bash
-GET api/seller/orders?status=processing&date_from=2024-03-01&date_to=2024-03-22&sort=date_desc&page=1&limit=10
-Authorization: Bearer JWT_TOKEN
+DELETE /api/order/12345
 ```
 
 **Приклад відповіді:**
 
-- Успішно
+- Успішно:
 
-```json
-{
-  "data": {
-    "items": [
-      {
-        "order_id": "12345",
-        "created_at": "2024-03-22T10:30:00Z",
-        "status": "processing",
-        "total_amount": 44000,
-        "customer": {
-          "name": "Іван Петренко",
-          "phone": "+380501234567"
-        },
-        "delivery_address": {
-          "city": "Київ",
-          "street": "вул. Хрещатик",
-          "house_number": "1",
-          "apartment": "5",
-          "postal_code": "01001"
-        },
-        "items": [
-          {
-            "product_id": "1",
-            "name": "Смартфон XYZ",
-            "subtotal": 30000
-          },
-          {
-            "product_id": "3",
-            "name": "Навушники ABC",
-            "subtotal": 14000
-          }
-        ],
-        "payment_status": "paid",
-        "notes": "Дзвонити за 30 хвилин до доставки"
-      }
-    ],
-    "total": 45,
-    "page": 1,
-    "pages": 5
+  ```json
+  {
+    "message": "Order deleted successfully"
   }
-}
-```
+  ```
 
-- Помилка
+- Помилка:
 
-```json
-{
-  "message": "Invalid date range"
-}
-```
+  ```json
+  {
+    "message": "Order not found"
+  }
+  ```
 
-**Коди відповіді:**
+  **Коди відповіді:**
 
-- 200 — Успішно отримано список замовлень
-- 400 — Некоректні параметри запиту
-- 401 — Не авторизований
-- 403 — Немає прав продавця
-- 500 — Помилка сервера
+- 200 — Акаунт успішно видалено.
+- 401 — Неавторизований доступ.
+- 404 — Користувача не знайдено.
+- 500 — Помилка сервера.
 
 ## Пошук товарів
 
@@ -852,15 +901,11 @@ Authorization: Bearer JWT_TOKEN
 - `category` (опціонально) — фільтр за категорією
 - `min_price` (опціонально) — мінімальна ціна
 - `max_price` (опціонально) — максимальна ціна
-- `in_stock` (опціонально) — наявність на складі (true/false)
-- `sort` (опціонально) — сортування (relevance, price_asc, price_desc, name_asc, name_desc)
-- `page` (опціонально) — номер сторінки (за замовчуванням: 1)
-- `limit` (опціонально) — кількість товарів на сторінці (за замовчуванням: 20)
 
 **Приклад запиту:**
 
 ```bash
-GET api/products/search?q=смартфон&category=electronics&min_price=10000&max_price=20000&in_stock=true&sort=relevance&page=1&limit=20
+GET /api/products/search?q=смартфон&category=electronics&min_price=10000&max_price=20000
 ```
 
 **Приклад відповіді:**
@@ -869,47 +914,32 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
 
 ```json
 {
-  "data": {
-    "items": [
-      {
-        "id": "1",
-        "name": "Смартфон XYZ",
-        "description": "Новий смартфон з потужним процесором",
-        "photo_url": "https://example.com/photos/xyz.jpg",
-        "category": "electronics",
-        "price": 15000,
-        "rating": 4.5,
-        "reviews_count": 28,
-        "relevance_score": 0.95
-      }
-    ],
-    "total": 156,
-    "page": 1,
-    "pages": 8,
-    "filters": {
-      "categories": [
-        {
-          "name": "electronics",
-          "count": 120
-        },
-        {
-          "name": "accessories",
-          "count": 36
-        }
-      ],
-      "price_range": {
-        "min": 10000,
-        "max": 20000
-      }
-    },
-    "applied_filters": {
-      "q": "смартфон",
+  "products": [
+    {
+      "_id": "674b4130d610f247670ab1ce",
+      "seller_id": "674a20082f2ac342ca1e2086",
+      "name": "Смартфон XYZ Pro",
+      "description": "Оновлений смартфон з потужним процесором",
+      "photo_url": "http://localhost:5000/uploads/products/photo_updated.jpg",
       "category": "electronics",
-      "min_price": 10000,
-      "max_price": 20000,
-      "in_stock": true
+      "price": 18000,
+      "createdAt": "2024-11-30T16:45:36.260Z",
+      "updatedAt": "2024-11-30T16:45:36.263Z",
+      "__v": 0
+    },
+    {
+      "_id": "674b5c62ee16e47d6da93a23",
+      "seller_id": "674a20082f2ac342ca1e2086",
+      "name": "Смартфон XYZ",
+      "description": "Новий смартфон з потужним процесором",
+      "photo_url": "http://localhost:5000/uploads/products/photo.jpg",
+      "category": "electronics",
+      "price": 15000,
+      "createdAt": "2024-11-30T18:41:38.266Z",
+      "updatedAt": "2024-11-30T18:41:38.271Z",
+      "__v": 0
     }
-  }
+  ]
 }
 ```
 
@@ -927,125 +957,48 @@ GET api/products/search?q=смартфон&category=electronics&min_price=10000&
 - 400 — Некоректні параметри пошуку
 - 500 — Помилка сервера
 
-## Перегляд картки замовлення
+## Завантаження зображень
 
-### GET /api/orders/{id}
+### POST /api/upload
 
-**Призначення:** отримання детальної інформації про замовлення (для покупця і продавця).
+**Призначення:** Завантаження зображення та збереження його в теку `uploads`.
 
-**Метод:** GET
+**Метод:** POST
 
 **Параметри запиту:**
 
-- `id` — ідентифікатор замовлення (в URL)
+- `image` — файл зображення, який завантажується (тип файлу: зображення, наприклад .jpg, .png).
 
 **Приклад запиту:**
 
 ```bash
-GET api/orders/12345
-Authorization: Bearer JWT_TOKEN
+POST http://localhost:5000/api/upload
+Content-Type: multipart/form-data
+
+image=@/path/to/your/image.jpg
 ```
 
 **Приклад відповіді:**
 
 - Успішно
 
-```json
-{
-  "data": {
-    "order": {
-      "id": "12345",
-      "created_at": "2024-03-22T10:30:00Z",
-      "updated_at": "2024-03-22T15:30:00Z",
-      "status": "shipped",
-      "total_amount": 44000
-    },
-    "customer": {
-      "id": "user123",
-      "name": "Іван Петренко",
-      "phone": "+380501234567",
-      "email": "ivan@example.com"
-    },
-    "seller": {
-      "id": "seller456",
-      "name": "Електроніка Store",
-      "phone": "+380671234567",
-      "email": "store@example.com"
-    },
-    "delivery": {
-      "address": {
-        "city": "Київ",
-        "street": "вул. Хрещатик",
-        "house_number": "1",
-        "apartment": "5",
-        "postal_code": "01001"
-      },
-      "tracking_number": "NP1234567890UA",
-      "carrier": "Нова Пошта",
-      "estimated_delivery": "2024-03-24"
-    },
-    "payment": {
-      "method": "card",
-      "status": "paid",
-      "payment_date": "2024-03-22T10:35:00Z",
-      "transaction_id": "pay_789xyz"
-    },
-    "items": [
-      {
-        "product_id": "1",
-        "name": "Смартфон XYZ",
-        "photo_url": "https://example.com/photos/xyz.jpg",
-        "price": 15000,
-        "subtotal": 30000
-      },
-      {
-        "product_id": "3",
-        "name": "Навушники ABC",
-        "photo_url": "https://example.com/photos/abc.jpg",
-        "price": 14000,
-        "subtotal": 14000
-      }
-    ],
-    "status_history": [
-      {
-        "status": "pending",
-        "timestamp": "2024-03-22T10:30:00Z",
-        "comment": "Замовлення створено"
-      },
-      {
-        "status": "processing",
-        "timestamp": "2024-03-22T10:35:00Z",
-        "comment": "Оплату підтверджено"
-      },
-      {
-        "status": "shipped",
-        "timestamp": "2024-03-22T15:30:00Z",
-        "comment": "Відправлено Новою Поштою",
-        "tracking_number": "NP1234567890UA"
-      }
-    ],
-    "notes": "Дзвонити за 30 хвилин до доставки",
-    "available_actions": {
-      "can_cancel": false,
-      "can_change_address": false,
-      "can_leave_review": false
-    }
+  ```json
+  {
+    "message": "File uploaded successfully",
+    "path": "uploads/image_2024-11-30_12-34-56.jpg"
   }
-}
-```
+  ```
 
-- Помилка
+- Помилка — файл не завантажено
 
-```json
-{
-  "message": "Order not found"
-}
-```
+  ```json
+  {
+    "message": "No file uploaded"
+  }
+  ```
 
 **Коди відповіді:**
 
-- 200 — Успішно отримано деталі замовлення
-- 401 — Не авторизований
-- 403 — Немає прав для перегляду цього замовлення
-- 404 — Замовлення не знайдено
-- 500 — Помилка сервера
+- 200 — Файл успішно завантажено.
+- 400 — Не було завантажено жодного файлу.
+- 500 — Помилка сервера під час обробки файлу.
