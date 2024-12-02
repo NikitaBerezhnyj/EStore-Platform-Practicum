@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
   role: { type: String, required: true, enum: ["customer", "seller"], default: "customer" },
   email: { type: String, required: true, unique: true, trim: true },
   phone: { type: String, required: false, unique: true, trim: true },
-  password: { type: String, required: true },
+  avatar_url: { type: String, required: true },
+  password: { type: String, required: true, default: "/img/standard_user.jpg" },
   createdAt: { type: Date, default: Date.now }
 });
 

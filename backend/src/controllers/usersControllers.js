@@ -136,56 +136,6 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// Отримання інформації про користувача
-// exports.getUserInfo = async (req, res) => {
-//   try {
-//     const { userId } = req.params;
-
-//     const user = await User.findById(userId).select("name email phone role");
-//     if (!user) {
-//       return res.status(404).send({ message: "User not found." });
-//     }
-
-//     let orders;
-
-//     if (user.role === "customer") {
-//       orders = await Order.find({ customer: userId }).select("date items total status").populate({
-//         path: "items.product",
-//         select: "name"
-//       });
-//     } else if (user.role === "seller") {
-//       orders = await Order.find({ seller: userId }).select("date items total status").populate({
-//         path: "items.product",
-//         select: "name"
-//       });
-//     } else {
-//       return res.status(400).send({ message: "Invalid role" });
-//     }
-
-//     const formattedOrders = orders.map(order => ({
-//       id: order._id,
-//       date: order.date,
-//       items: order.items.map(item => ({
-//         product: item.product.name,
-//         price: item.price,
-//         quantity: item.quantity
-//       })),
-//       total: order.total,
-//       status: order.status
-//     }));
-
-//     res.status(200).send({
-//       name: user.name,
-//       email: user.email,
-//       phone: user.phone || null,
-//       orders: formattedOrders
-//     });
-//   } catch (err) {
-//     console.error("Error fetching user info:", err);
-//     res.status(500).send({ message: "Internal Server Error" });
-//   }
-// };
-
 exports.getUserInfo = async (req, res) => {
   try {
     const { userId } = req.params;
