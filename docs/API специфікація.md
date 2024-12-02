@@ -246,6 +246,7 @@ GET /api/user/{id}
     "name": "Alex Smith",
     "email": "alexsmith@example.com",
     "phone": "+380673244890",
+    "avatar_url": "http://localhost:5000/uploads/avatar.jpg",
     "orders": [
       {
         "id": "b213f8e7a8b13d4c975e8d7b",
@@ -324,6 +325,8 @@ GET /api/user/{id}
 - `name` — нове ім'я користувача.
 - `email` — новий email користувача.
 - `role` - нова роль користувача.
+- `phone` - новий номер телефону.
+- `avatar_url` - нове посилання на аватар.
 
 Приклад запиту:
 
@@ -335,7 +338,8 @@ Content-Type: application/json
   "name": "Jane Doe",
   "email": "janedoe@example.com",
   "phone": "+380501234567",
-  "role": "seller"
+  "role": "seller",
+  "avatar_url": "http://localhost:5000/uploads/new_avatar.jpg",
 }
 ```
 
