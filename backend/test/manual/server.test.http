@@ -1,0 +1,4 @@
+@apiURL = http://localhost:5000/api
+
+### Запит на перевірку статусу сервера
+POST {{apiURL}}/status
