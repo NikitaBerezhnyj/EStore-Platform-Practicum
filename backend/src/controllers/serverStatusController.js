@@ -6,7 +6,6 @@ exports.checkServerStatus = async (req, res) => {
     const dbState = mongoose.connection.readyState;
     const dbStatus = ["Disconnected", "Connected", "Connecting", "Disconnecting"][dbState];
 
-    // Відповідь сервера
     res.status(200).send({
       message: "Server health check successful",
       status: {
